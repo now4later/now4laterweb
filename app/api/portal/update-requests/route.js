@@ -5,7 +5,6 @@ import { resend } from "../../../../lib/resend";
 
 const CATEGORIES = ["Photos", "Videos", "Events", "Text/Content", "Links", "Other"];
 
-// GET /api/portal/update-requests — list this client's own requests + files
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -21,10 +20,6 @@ export async function GET() {
   return Response.json({ updateRequests });
 }
 
-// POST /api/portal/update-requests — create a new update request
-// Body: { category, description }
-// Files are attached afterward via /api/portal/upload, referencing the
-// returned updateRequest.id.
 export async function POST(request) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -54,7 +49,7 @@ export async function POST(request) {
       process.env.INQUIRY_FROM_EMAIL &&
       process.env.INQUIRY_TO_EMAIL
     ) {
-      await resend.emails.send({
+      const notifySend = await resend.emails.send({
         from: process.env.INQUIRY_FROM_EMAIL,
         to: process.env.INQUIRY_TO_EMAIL,
         subject: `New update request: ${session.user.email}`,
@@ -63,6 +58,12 @@ export async function POST(request) {
           <p><strong>Description:</strong> ${description}</p>
           <p>View it in the admin dashboard.</p>`,
       });
+      if (notifySend.error) {
+        console.error("Resend rejected the update-request notification:", {
+          name: notifySend.error.name,
+          message: notifySend.error.message,
+        });
+      }
     }
   } catch (err) {
     console.error("Update request notification email failed:", err);
