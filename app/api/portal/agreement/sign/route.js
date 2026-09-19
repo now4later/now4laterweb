@@ -9,7 +9,6 @@ function hashContent(text) {
 }
 
 function getClientIp(request) {
-  // Vercel sets x-forwarded-for; take the first (client) address.
   const fwd = request.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
   return request.headers.get("x-real-ip") || "unknown";
@@ -88,14 +87,12 @@ export async function POST(request) {
     }),
   ]);
 
-  // Best-effort confirmation emails — signing already succeeded even if
-  // email delivery fails, so this is intentionally non-blocking on error.
   try {
     if (process.env.RESEND_API_KEY && process.env.INQUIRY_FROM_EMAIL) {
       const from = process.env.INQUIRY_FROM_EMAIL;
       const adminTo = process.env.INQUIRY_TO_EMAIL;
 
-      await resend.emails.send({
+      const clientSend = await resend.emails.send({
         from,
         to: session.user.email,
         subject: "Your NOW4LATERWEB agreement is signed",
@@ -105,15 +102,27 @@ export async function POST(request) {
           <p>Payment option selected: <strong>${paymentOption === "FULL" ? "Full payment ($1,000)" : "Split payment ($500 + $500)"}</strong></p>
           <p>Keep this email for your records.</p>`,
       });
+      if (clientSend.error) {
+        console.error("Resend rejected the client signature confirmation:", {
+          name: clientSend.error.name,
+          message: clientSend.error.message,
+        });
+      }
 
       if (adminTo) {
-        await resend.emails.send({
+        const adminSend = await resend.emails.send({
           from,
           to: adminTo,
           subject: `Agreement signed: ${agreement.client.email}`,
           html: `<p>${signerName} (${agreement.client.email}) signed agreement v${agreement.version}.</p>
             <p>Payment option: ${paymentOption}</p>`,
         });
+        if (adminSend.error) {
+          console.error("Resend rejected the admin signature notification:", {
+            name: adminSend.error.name,
+            message: adminSend.error.message,
+          });
+        }
       }
     }
   } catch (err) {
