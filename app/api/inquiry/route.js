@@ -59,7 +59,10 @@ export async function POST(request) {
         message: error.message,
       });
       return Response.json(
-        { error: "Failed to send inquiry email." },
+        {
+          error: "Resend rejected the inquiry email.",
+          details: error.message,
+        },
         { status: 502 }
       );
     }
