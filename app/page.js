@@ -13,6 +13,7 @@ export default function Home() {
     message: "",
   });
   const [status, setStatus] = useState(null); // null | "sending" | "success" | "error"
+  const [errorMessage, setErrorMessage] = useState("");
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -22,13 +23,17 @@ export default function Home() {
   async function handleSubmit(e) {
     e.preventDefault();
     setStatus("sending");
+    setErrorMessage("");
     try {
       const res = await fetch("/api/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error("Request failed");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.details || data?.error || "Request failed");
+      }
       setStatus("success");
       setForm({
         name: "",
@@ -39,6 +44,7 @@ export default function Home() {
       });
     } catch (err) {
       setStatus("error");
+      setErrorMessage(err?.message || "Something went wrong sending your inquiry.");
     }
   }
 
@@ -664,8 +670,7 @@ export default function Home() {
               )}
               {status === "error" && (
                 <p className="form-status error">
-                  Something went wrong sending your inquiry. Please try again
-                  or email us directly.
+{errorMessage || "Something went wrong sending your inquiry. Please try again or email us directly."}
                 </p>
               )}
             </form>
