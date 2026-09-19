@@ -37,7 +37,7 @@ export async function POST(request) {
       );
     }
 
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from,
       to,
       replyTo: email,
@@ -53,7 +53,18 @@ export async function POST(request) {
       `,
     });
 
-    return Response.json({ ok: true });
+    if (error) {
+      console.error("Resend rejected the inquiry email:", {
+        name: error.name,
+        message: error.message,
+      });
+      return Response.json(
+        { error: "Failed to send inquiry email." },
+        { status: 502 }
+      );
+    }
+
+    return Response.json({ ok: true, id: data?.id });
   } catch (err) {
     console.error("Inquiry send failed:", err);
     return Response.json(
