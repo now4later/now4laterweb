@@ -1,0 +1,135 @@
+// NOW4LATERWEB — database schema
+// Run `npx prisma migrate dev --name init` after setting DATABASE_URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  ADMIN
+}
+
+enum PaymentOption {
+  FULL
+  SPLIT
+}
+
+enum AgreementStatus {
+  PENDING
+  SIGNED
+}
+
+enum ProjectStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  REVIEW
+  LAUNCHED
+}
+
+enum PaymentType {
+  DEPOSIT
+  BALANCE
+  FULL
+  MAINTENANCE
+  UPDATE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+}
+
+enum UpdateRequestStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+}
+
+// A single table for both clients and the admin (Tariq), distinguished by role.
+// Every client-owned record is scoped by userId — the app layer must always
+// filter by the logged-in user's id (or check role === ADMIN) before returning data.
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  role          Role     @default(CLIENT)
+  name          String?
+  businessName  String?
+  createdAt     DateTime @default(now())
+
+  agreements     Agreement[]
+  updateRequests UpdateRequest[]
+  files          ProjectFile[]
+}
+
+model Agreement {
+  id            String          @id @default(cuid())
+  clientId      String
+  client        User            @relation(fields: [clientId], references: [id])
+  version       Int             @default(1)
+  content       String          @db.Text // full agreement text as shown at signing time
+  paymentOption PaymentOption? // chosen by the client at signing time — null until signed
+  totalAmount   Int             @default(100000) // cents ($1,000.00)
+  status        AgreementStatus @default(PENDING)
+  projectStatus ProjectStatus   @default(NOT_STARTED)
+  createdAt     DateTime        @default(now())
+
+  signature Signature?
+  payments  Payment[]
+}
+
+// The self-built attestation/signature record. Not a third-party e-signature
+// provider — see README for what this does and does not guarantee.
+model Signature {
+  id               String    @id @default(cuid())
+  agreementId      String    @unique
+  agreement        Agreement @relation(fields: [agreementId], references: [id])
+  signerName       String
+  signerEmail      String
+  agreementVersion Int
+  agreementHash    String // sha256 of the exact agreement text shown at signing
+  ipAddress        String
+  userAgent        String
+  signedAt         DateTime  @default(now())
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  agreementId String
+  agreement   Agreement     @relation(fields: [agreementId], references: [id])
+  amount      Int // cents
+  type        PaymentType
+  status      PaymentStatus @default(PENDING)
+  dueDate     DateTime?
+  paidAt      DateTime?
+  notes       String?
+}
+
+model UpdateRequest {
+  id          String               @id @default(cuid())
+  clientId    String
+  client      User                 @relation(fields: [clientId], references: [id])
+  category    String // Photos | Videos | Events | Text/Content | Links | Other
+  description String               @db.Text
+  status      UpdateRequestStatus  @default(OPEN)
+  createdAt   DateTime             @default(now())
+
+  files ProjectFile[]
+}
+
+model ProjectFile {
+  id              String         @id @default(cuid())
+  clientId        String
+  client          User           @relation(fields: [clientId], references: [id])
+  updateRequestId String?
+  updateRequest   UpdateRequest? @relation(fields: [updateRequestId], references: [id])
+  url             String
+  filename        String
+  createdAt       DateTime       @default(now())
+}
