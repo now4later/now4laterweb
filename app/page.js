@@ -418,8 +418,7 @@ export default function Home() {
               Professional websites without the unnecessary complexity.
             </h2>
             <p className="section-description">
-              Every project can be customized around your needs. The options
-              below give you a starting point.
+              Every project can be customized around your needs. Every project is different, so pricing and payment options are discussed during your consultation.
             </p>
 
             <div className="pricing-grid">
@@ -428,7 +427,7 @@ export default function Home() {
                 <p className="price-description">
                   For a simple professional online presence.
                 </p>
-                <div className="amount">$750</div>
+                <div className="amount">Discussed in Consultation</div>
                 <ul className="features">
                   <li>Professional custom design</li>
                   <li>Mobile responsive layout</li>
@@ -447,7 +446,7 @@ export default function Home() {
                 <p className="price-description">
                   A complete business website built around your brand.
                 </p>
-                <div className="amount">$1,000</div>
+                <div className="amount">Discussed in Consultation</div>
                 <ul className="features">
                   <li>Custom professional website</li>
                   <li>Mobile &amp; desktop optimization</li>
@@ -535,15 +534,15 @@ export default function Home() {
               {[
                 {
                   q: "How much does a website cost?",
-                  a: "A standard professional website starts at $1,000 for the professional package shown above. Custom projects can be quoted separately.",
+                  a: "Pricing is customized to the project. We discuss the scope, features, timeline, and investment during your consultation.",
                 },
                 {
                   q: "Can I split the $1,000 payment?",
-                  a: "Yes. The standard split discussed for a $1,000 project is $500 upfront and the remaining $500 according to the agreed project payment deadline.",
+                  a: "Yes. Payment options can be discussed during your consultation and structured around the project scope and agreed timeline.",
                 },
                 {
                   q: "Do you offer website maintenance?",
-                  a: "Yes. Ongoing maintenance can be offered at $100 per month for reasonable content updates and maintenance. Clients can also request individual updates for $100 per update service.",
+                  a: "Yes. Ongoing maintenance and individual update options are available and can be discussed during your consultation.",
                 },
                 {
                   q: "What is included in maintenance?",
