@@ -7,6 +7,7 @@ import AddClientForm from "./AddClientForm";
 import CreateAgreementForm from "./CreateAgreementForm";
 import AdminAgreementsTable from "./AdminAgreementsTable";
 import AdminUpdateRequestsSection from "./AdminUpdateRequestsSection";
+import ResetClientPasswordForm from "./ResetClientPasswordForm";
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
@@ -67,8 +68,13 @@ export default async function AdminPage() {
           <ul style={{ marginTop: "10px" }}>
             {clients.map((c) => (
               <li key={c.id}>
-                {c.email} {c.businessName ? `— ${c.businessName}` : ""} —
-                joined {new Date(c.createdAt).toLocaleDateString()}
+                <div>
+                  {c.email} {c.businessName ? `— ${c.businessName}` : ""} —
+                  joined {new Date(c.createdAt).toLocaleDateString()}
+                </div>
+                <div style={{ marginTop: "8px" }}>
+                  <ResetClientPasswordForm email={c.email} />
+                </div>
               </li>
             ))}
           </ul>
