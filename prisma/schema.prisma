@@ -18,6 +18,7 @@ enum Role {
 enum PaymentOption {
   FULL
   SPLIT
+  PAYMENT_PLAN
 }
 
 enum AgreementStatus {
@@ -51,9 +52,6 @@ enum UpdateRequestStatus {
   DONE
 }
 
-// A single table for both clients and the admin (Tariq), distinguished by role.
-// Every client-owned record is scoped by userId — the app layer must always
-// filter by the logged-in user's id (or check role === ADMIN) before returning data.
 model User {
   id            String   @id @default(cuid())
   email         String   @unique
@@ -73,9 +71,9 @@ model Agreement {
   clientId      String
   client        User            @relation(fields: [clientId], references: [id])
   version       Int             @default(1)
-  content       String          @db.Text // full agreement text as shown at signing time
-  paymentOption PaymentOption? // chosen by the client at signing time — null until signed
-  totalAmount   Int             @default(100000) // cents ($1,000.00)
+  content       String          @db.Text
+  paymentOption PaymentOption?
+  totalAmount   Int             @default(100000)
   status        AgreementStatus @default(PENDING)
   projectStatus ProjectStatus   @default(NOT_STARTED)
   createdAt     DateTime        @default(now())
@@ -84,8 +82,6 @@ model Agreement {
   payments  Payment[]
 }
 
-// The self-built attestation/signature record. Not a third-party e-signature
-// provider — see README for what this does and does not guarantee.
 model Signature {
   id               String    @id @default(cuid())
   agreementId      String    @unique
@@ -93,7 +89,7 @@ model Signature {
   signerName       String
   signerEmail      String
   agreementVersion Int
-  agreementHash    String // sha256 of the exact agreement text shown at signing
+  agreementHash    String
   ipAddress        String
   userAgent        String
   signedAt         DateTime  @default(now())
@@ -103,7 +99,7 @@ model Payment {
   id          String        @id @default(cuid())
   agreementId String
   agreement   Agreement     @relation(fields: [agreementId], references: [id])
-  amount      Int // cents
+  amount      Int
   type        PaymentType
   status      PaymentStatus @default(PENDING)
   dueDate     DateTime?
@@ -112,13 +108,13 @@ model Payment {
 }
 
 model UpdateRequest {
-  id          String               @id @default(cuid())
+  id          String              @id @default(cuid())
   clientId    String
-  client      User                 @relation(fields: [clientId], references: [id])
-  category    String // Photos | Videos | Events | Text/Content | Links | Other
-  description String               @db.Text
-  status      UpdateRequestStatus  @default(OPEN)
-  createdAt   DateTime             @default(now())
+  client      User                @relation(fields: [clientId], references: [id])
+  category    String
+  description String              @db.Text
+  status      UpdateRequestStatus @default(OPEN)
+  createdAt   DateTime            @default(now())
 
   files ProjectFile[]
 }
