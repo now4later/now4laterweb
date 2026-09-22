@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth";
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
@@ -14,9 +13,14 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const email = String(body?.email || "").trim().toLowerCase();
+    const password = String(body?.password || "");
 
-    if (!email) {
-      return NextResponse.json({ error: "Client email is required." }, { status: 400 });
+    if (!email || !password) {
+      return NextResponse.json({ error: "Client email and password are required." }, { status: 400 });
+    }
+
+    if (password.length < 8) {
+      return NextResponse.json({ error: "Client password must be at least 8 characters." }, { status: 400 });
     }
 
     const client = await prisma.user.findFirst({
@@ -28,20 +32,16 @@ export async function POST(request) {
       return NextResponse.json({ error: "Client account not found." }, { status: 404 });
     }
 
-    const tempPassword = crypto.randomBytes(12).toString("base64url");
-    const passwordHash = await bcrypt.hash(tempPassword, 12);
+    const passwordHash = await bcrypt.hash(password, 12);
 
     await prisma.user.update({
       where: { id: client.id },
       data: { passwordHash },
     });
 
-    return NextResponse.json({
-      client: { id: client.id, email: client.email },
-      tempPassword,
-    });
+    return NextResponse.json({ ok: true, client: { id: client.id, email: client.email } });
   } catch (error) {
-    console.error("Client password reset error:", error);
-    return NextResponse.json({ error: "Unable to reset the client password." }, { status: 500 });
+    console.error("Client password update error:", error);
+    return NextResponse.json({ error: "Unable to update the client password." }, { status: 500 });
   }
 }
