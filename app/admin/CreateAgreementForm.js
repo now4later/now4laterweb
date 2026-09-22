@@ -44,10 +44,13 @@ electronic signature, and other terms.
 export default function CreateAgreementForm({ clients }) {
   const router = useRouter();
   const [clientId, setClientId] = useState(clients[0]?.id || "");
-  const today = new Date().toISOString().slice(0, 10);
-  const [paymentDates, setPaymentDates] = useState(
-    Array.from({ length: 5 }, (_, i) => addDays(today, i * 30))
-  );
+  const [paymentDates, setPaymentDates] = useState([
+    "2026-10-02",
+    "2026-11-02",
+    "2026-12-02",
+    "2027-01-02",
+    "2027-02-02",
+  ]);
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
