@@ -46,19 +46,25 @@ export async function POST(request) {
   const ipAddress = getClientIp(request);
   const userAgent = request.headers.get("user-agent") || "unknown";
 
-  let paymentDates = [];
+  const paymentDates = [];
   const match = agreement.content.match(/Payment [1-5] — \$200\.00 — due (.+)/g);
   if (match) {
-    paymentDates = match.map((line) => line.replace(/^Payment [1-5] — \$200\.00 — due /, ""));
+    for (const line of match) {
+      const text = line.replace(/^Payment [1-5] — \$200\.00 — due /, "").trim();
+      const parsed = new Date(text);
+      if (!Number.isNaN(parsed.getTime())) paymentDates.push(parsed);
+    }
   }
 
-  const dueDates = [];
-  const base = new Date();
-  for (let i = 0; i < 5; i++) {
-    const d = new Date(base);
-    d.setDate(d.getDate() + i * 30);
-    dueDates.push(d);
+  if (paymentDates.length !== 5) {
+    return Response.json({ error: "The agreement does not contain five valid payment due dates." }, { status: 400 });
   }
+
+  const dueDates = paymentDates.map((d) => {
+    const local = new Date(d);
+    local.setHours(12, 0, 0, 0);
+    return local;
+  });
 
   const payments = dueDates.map((dueDate, i) => ({
     amount: 20000,
