@@ -64,9 +64,7 @@ export default async function PortalPage() {
             <p style={{ marginTop: "8px" }}>
               Payment option:{" "}
               <strong>
-                {agreement.paymentOption === "FULL"
-                  ? "Full payment ($1,000)"
-                  : "Split payment ($500 + $500)"}
+                5 payments of $200.00
               </strong>
             </p>
             <p style={{ marginTop: "4px" }}>
