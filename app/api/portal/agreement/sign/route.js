@@ -16,25 +16,17 @@ function getClientIp(request) {
 
 export async function POST(request) {
   const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return Response.json({ error: "Not signed in" }, { status: 401 });
-  }
+  if (!session?.user) return Response.json({ error: "Not signed in" }, { status: 401 });
 
   const body = await request.json();
   const { agreementId, paymentOption, signerName, agreeChecked } = body || {};
 
   if (!agreementId || !paymentOption || !signerName || !agreeChecked) {
-    return Response.json(
-      {
-        error:
-          "Agreement, payment option, full name, and explicit agreement are all required.",
-      },
-      { status: 400 }
-    );
+    return Response.json({ error: "Agreement, payment plan, full name, and explicit agreement are all required." }, { status: 400 });
   }
 
-  if (!["FULL", "SPLIT"].includes(paymentOption)) {
-    return Response.json({ error: "Invalid payment option." }, { status: 400 });
+  if (paymentOption !== "PAYMENT_PLAN") {
+    return Response.json({ error: "This agreement requires the five-payment plan." }, { status: 400 });
   }
 
   const agreement = await prisma.agreement.findUnique({
@@ -47,30 +39,41 @@ export async function POST(request) {
   }
 
   if (agreement.status === "SIGNED") {
-    return Response.json(
-      { error: "This agreement has already been signed." },
-      { status: 409 }
-    );
+    return Response.json({ error: "This agreement has already been signed." }, { status: 409 });
   }
 
   const agreementHash = hashContent(agreement.content);
   const ipAddress = getClientIp(request);
   const userAgent = request.headers.get("user-agent") || "unknown";
 
-  const payments =
-    paymentOption === "FULL"
-      ? [{ amount: agreement.totalAmount, type: "FULL", status: "PENDING" }]
-      : [
-          { amount: agreement.totalAmount / 2, type: "DEPOSIT", status: "PENDING" },
-          { amount: agreement.totalAmount / 2, type: "BALANCE", status: "PENDING" },
-        ];
+  let paymentDates = [];
+  const match = agreement.content.match(/Payment [1-5] — \$200\.00 — due (.+)/g);
+  if (match) {
+    paymentDates = match.map((line) => line.replace(/^Payment [1-5] — \$200\.00 — due /, ""));
+  }
+
+  const dueDates = [];
+  const base = new Date();
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(base);
+    d.setDate(d.getDate() + i * 30);
+    dueDates.push(d);
+  }
+
+  const payments = dueDates.map((dueDate, i) => ({
+    amount: 20000,
+    type: i === 0 ? "DEPOSIT" : "BALANCE",
+    status: "PENDING",
+    dueDate,
+    notes: `Payment ${i + 1} of 5 — scheduled $200 installment`,
+  }));
 
   const [, signature] = await prisma.$transaction([
     prisma.agreement.update({
       where: { id: agreement.id },
       data: {
         status: "SIGNED",
-        paymentOption,
+        paymentOption: "PAYMENT_PLAN",
         payments: { create: payments },
       },
     }),
@@ -91,38 +94,25 @@ export async function POST(request) {
     if (process.env.RESEND_API_KEY && process.env.INQUIRY_FROM_EMAIL) {
       const from = process.env.INQUIRY_FROM_EMAIL;
       const adminTo = process.env.INQUIRY_TO_EMAIL;
-
       const clientSend = await resend.emails.send({
         from,
         to: session.user.email,
         subject: "Your NOW4LATERWEB agreement is signed",
         html: `<p>Hi ${signerName},</p>
-          <p>This confirms your NOW4LATERWEB website development agreement
-          (version ${agreement.version}) was signed on ${new Date().toLocaleString()}.</p>
-          <p>Payment option selected: <strong>${paymentOption === "FULL" ? "Full payment ($1,000)" : "Split payment ($500 + $500)"}</strong></p>
+          <p>This confirms your NOW4LATERWEB website development and maintenance agreement (version ${agreement.version}) was signed on ${new Date().toLocaleString()}.</p>
+          <p>Payment plan selected: <strong>5 payments of $200.00</strong></p>
           <p>Keep this email for your records.</p>`,
       });
-      if (clientSend.error) {
-        console.error("Resend rejected the client signature confirmation:", {
-          name: clientSend.error.name,
-          message: clientSend.error.message,
-        });
-      }
+      if (clientSend.error) console.error("Resend rejected the client signature confirmation:", { name: clientSend.error.name, message: clientSend.error.message });
 
       if (adminTo) {
         const adminSend = await resend.emails.send({
           from,
           to: adminTo,
           subject: `Agreement signed: ${agreement.client.email}`,
-          html: `<p>${signerName} (${agreement.client.email}) signed agreement v${agreement.version}.</p>
-            <p>Payment option: ${paymentOption}</p>`,
+          html: `<p>${signerName} (${agreement.client.email}) signed agreement v${agreement.version}.</p><p>Payment plan: 5 payments of $200.00.</p>`,
         });
-        if (adminSend.error) {
-          console.error("Resend rejected the admin signature notification:", {
-            name: adminSend.error.name,
-            message: adminSend.error.message,
-          });
-        }
+        if (adminSend.error) console.error("Resend rejected the admin signature notification:", { name: adminSend.error.name, message: adminSend.error.message });
       }
     }
   } catch (err) {
