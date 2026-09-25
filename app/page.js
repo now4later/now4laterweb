@@ -209,28 +209,28 @@ export default function Home() {
 
         <section className="portfolio" id="portfolio">
           <div className="container">
-            <div className="section-label">OUR WORK</div>
-            <h2 className="section-title">Websites made to make an impression.</h2>
-            <p className="section-description">A few examples of the types of projects Now For Later can create.</p>
+            <div className="section-label">CURRENTLY IN PROGRESS</div>
+            <h2 className="section-title">Projects we're working on.</h2>
+            <p className="section-description">
+              Take a look at a current website project we're developing for a client.
+              You can preview the site while it's still being built.
+            </p>
 
             <div className="portfolio-grid">
-              {[
-                { tag: "BUSINESS WEBSITE", title: "Professional Business Site", desc: "Modern website built to establish credibility and generate customer inquiries." },
-                { tag: "SERVICE BUSINESS", title: "Local Service Website", desc: "Clear services, contact information, and calls to action for local customers." },
-                { tag: "PORTFOLIO", title: "Creative Portfolio", desc: "A visual online presence designed to showcase work and projects." },
-                { tag: "LANDING PAGE", title: "Campaign Landing Page", desc: "A focused page designed around one offer or customer action." },
-                { tag: "PERSONAL WEBSITE", title: "Personal Brand Site", desc: "A polished digital home for a person's story, services, and brand." },
-                { tag: "CUSTOM WEBSITE", title: "Custom Digital Experience", desc: "A website shaped around a client's specific goals and audience." },
-              ].map((p) => (
-                <div className="project" key={p.title}>
-                  <div className="project-image">{p.tag}</div>
-                  <div className="project-info">
-                    <div className="project-tag">{p.tag}</div>
-                    <h3>{p.title}</h3>
-                    <p>{p.desc}</p>
-                  </div>
+              <div className="project">
+                <div className="project-image">R&amp;J PRODUCTIONS</div>
+                <div className="project-info">
+                  <div className="project-tag">WEBSITE IN PROGRESS</div>
+                  <h3>R&amp;J Productions</h3>
+                  <p>
+                    A custom website currently being developed to showcase R&amp;J Productions,
+                    their live entertainment, events, media, and community work.
+                  </p>
+                  <a href="https://r-j-productions.vercel.app/" className="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+                    Preview Website ↗
+                  </a>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </section>
