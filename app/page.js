@@ -209,11 +209,10 @@ export default function Home() {
 
         <section className="portfolio" id="portfolio">
           <div className="container">
-            <div className="section-label">CURRENTLY IN PROGRESS</div>
-            <h2 className="section-title">Projects we're working on.</h2>
+            <div className="section-label">RECENT LAUNCH</div>
+            <h2 className="section-title">A website we designed and launched.</h2>
             <p className="section-description">
-              Take a look at a current website project we're developing for a client.
-              You can preview the site while it's still being built.
+              Take a look at a website we built and released for a client.
             </p>
 
             <div className="portfolio-grid">
@@ -223,7 +222,7 @@ export default function Home() {
                   <div className="project-tag">WEBSITE LAUNCHED</div>
                   <h3>R&amp;J Productions</h3>
                   <p>
-                    A custom website currently being developed to showcase R&amp;J Productions,
+                    A custom website we designed and launched for R&amp;J Productions, showcasing
                     their live entertainment, events, media, and community work.
                   </p>
                   <a href="https://rjproductions.org/" className="btn btn-secondary" target="_blank" rel="noopener noreferrer">
