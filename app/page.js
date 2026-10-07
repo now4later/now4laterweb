@@ -59,7 +59,6 @@ export default function Home() {
 
           <ul className={`nav-links${menuOpen ? " open" : ""}`} id="navLinks">
             <li><a href="#services" onClick={() => setMenuOpen(false)}>Services</a></li>
-            <li><a href="#portfolio" onClick={() => setMenuOpen(false)}>Portfolio</a></li>
             <li><a href="#process" onClick={() => setMenuOpen(false)}>How It Works</a></li>
             <li><a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a></li>
             <li><a href="#about" onClick={() => setMenuOpen(false)}>About</a></li>
@@ -203,33 +202,6 @@ export default function Home() {
               <div className="why-item"><div className="why-number">2</div><div><h3>Easy Navigation</h3><p>Customers should be able to find what they need without getting lost.</p></div></div>
               <div className="why-item"><div className="why-number">3</div><div><h3>Mobile Friendly</h3><p>Your website will be designed to look great on phones, tablets, and computers.</p></div></div>
               <div className="why-item"><div className="why-number">4</div><div><h3>Built Around You</h3><p>Your website should represent your business, not look like everybody else's.</p></div></div>
-            </div>
-          </div>
-        </section>
-
-        <section className="portfolio" id="portfolio">
-          <div className="container">
-            <div className="section-label">RECENT LAUNCH</div>
-            <h2 className="section-title">A website we designed and launched.</h2>
-            <p className="section-description">
-              Take a look at a website we built and released for a client.
-            </p>
-
-            <div className="portfolio-grid">
-              <div className="project">
-                <div className="project-image">R&amp;J PRODUCTIONS</div>
-                <div className="project-info">
-                  <div className="project-tag">WEBSITE LAUNCHED</div>
-                  <h3>R&amp;J Productions</h3>
-                  <p>
-                    A custom website we designed and launched for R&amp;J Productions, showcasing
-                    their live entertainment, events, media, and community work.
-                  </p>
-                  <a href="https://rjproductions.org/" className="btn btn-secondary" target="_blank" rel="noopener noreferrer">
-                    Preview Website ↗
-                  </a>
-                </div>
-              </div>
             </div>
           </div>
         </section>
