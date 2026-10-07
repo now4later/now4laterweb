@@ -220,7 +220,7 @@ export default function Home() {
               <div className="project">
                 <div className="project-image">R&amp;J PRODUCTIONS</div>
                 <div className="project-info">
-                  <div className="project-tag">WEBSITE IN PROGRESS</div>
+                  <div className="project-tag">WEBSITE LAUNCHED</div>
                   <h3>R&amp;J Productions</h3>
                   <p>
                     A custom website currently being developed to showcase R&amp;J Productions,
