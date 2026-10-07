@@ -226,7 +226,7 @@ export default function Home() {
                     A custom website currently being developed to showcase R&amp;J Productions,
                     their live entertainment, events, media, and community work.
                   </p>
-                  <a href="https://r-j-productions.vercel.app/" className="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+                  <a href="https://rjproductions.org/" className="btn btn-secondary" target="_blank" rel="noopener noreferrer">
                     Preview Website ↗
                   </a>
                 </div>
