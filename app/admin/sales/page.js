@@ -6,6 +6,7 @@ import { prisma } from "../../../lib/prisma";
 import SignOutButton from "../../components/SignOutButton";
 import ProspectForm from "./ProspectForm";
 import ProspectStatus from "./ProspectStatus";
+import OutreachDraftForm from "./OutreachDraftForm";
 
 const labels = {
   NEW: "New", RESEARCHING: "Researching", DRAFT_READY: "Draft ready",
@@ -32,6 +33,7 @@ export default async function SalesDashboardPage() {
     ["Replies", count("REPLIED")],
     ["Appointments", count("APPOINTMENT")],
     ["Qualified", count("QUALIFIED")],
+    ["Drafts", prospects.reduce((total, p) => total + p.messages.length, 0)],
   ];
 
   return (
@@ -67,7 +69,7 @@ export default async function SalesDashboardPage() {
         {prospects.length === 0 ? <p style={{ opacity: .7 }}>No prospects yet. Add your first business above.</p> : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "680px" }}>
-              <thead><tr>{["Business", "Contact", "Location", "Status", "Last activity"].map((heading) => <th key={heading} style={{ textAlign: "left", padding: "10px", borderBottom: "1px solid var(--border, #e1e4e8)", fontSize: "13px" }}>{heading}</th>)}</tr></thead>
+              <thead><tr>{["Business", "Contact", "Location", "Status", "Outreach", "Last activity"].map((heading) => <th key={heading} style={{ textAlign: "left", padding: "10px", borderBottom: "1px solid var(--border, #e1e4e8)", fontSize: "13px" }}>{heading}</th>)}</tr></thead>
               <tbody>
                 {prospects.map((p) => (
                   <tr key={p.id}>
@@ -79,6 +81,7 @@ export default async function SalesDashboardPage() {
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{p.contactName || "—"}</td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{p.location || "—"}</td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}><ProspectStatus id={p.id} initialStatus={p.status} />{p.optedOut && <div style={{ color: "#b42318", fontSize: "12px" }}>Opted out</div>}</td>
+                    <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}><OutreachDraftForm prospectId={p.id} businessName={p.businessName} disabled={p.optedOut || p.status === "DO_NOT_CONTACT"} />{p.messages.length > 0 && <div style={{ fontSize: "12px", opacity: .7, marginTop: "5px" }}>{p.messages.length} draft(s)</div>}</td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{new Date(p.updatedAt).toLocaleDateString("en-US")}</td>
                   </tr>
                 ))}
@@ -87,7 +90,7 @@ export default async function SalesDashboardPage() {
           </div>
         )}
       </section>
-      <p style={{ marginTop: "18px", fontSize: "13px", opacity: .7 }}>Outbound email is not enabled in this first dashboard build. Pricing, negotiation, and closing remain yours.</p>
+      <p style={{ marginTop: "18px", fontSize: "13px", opacity: .7 }}>Drafts are saved for your review only. No messages are sent automatically. Pricing, negotiation, and closing remain yours.</p>
     </main>
   );
 }
