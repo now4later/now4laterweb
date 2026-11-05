@@ -129,3 +129,57 @@ model ProjectFile {
   filename        String
   createdAt       DateTime       @default(now())
 }
+
+
+enum ProspectStatus {
+  NEW
+  RESEARCHING
+  DRAFT_READY
+  CONTACTED
+  REPLIED
+  QUALIFIED
+  APPOINTMENT
+  WON
+  LOST
+  DO_NOT_CONTACT
+}
+
+enum OutreachStatus {
+  DRAFT
+  SENT
+  REPLIED
+  FAILED
+}
+
+model Prospect {
+  id             String         @id @default(cuid())
+  businessName   String
+  contactName    String?
+  email          String?
+  phone          String?
+  website        String?
+  location       String?
+  category       String?
+  source         String?
+  websiteQuality String?
+  researchNotes  String?        @db.Text
+  status         ProspectStatus @default(NEW)
+  optedOut       Boolean        @default(false)
+  followUpAt     DateTime?
+  lastContactedAt DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  messages       OutreachMessage[]
+}
+
+model OutreachMessage {
+  id          String         @id @default(cuid())
+  prospectId  String
+  prospect    Prospect       @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  subject     String
+  body        String         @db.Text
+  status      OutreachStatus @default(DRAFT)
+  providerId  String?
+  sentAt      DateTime?
+  createdAt   DateTime       @default(now())
+}
