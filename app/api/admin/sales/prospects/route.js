@@ -81,6 +81,15 @@ export async function PATCH(request) {
       data.followUpAt = date;
     }
   }
+  if (body.category !== undefined) data.category = String(body.category).trim().slice(0, 100) || null;
+  if (body.source !== undefined) data.source = String(body.source).trim().slice(0, 160) || null;
+  if (body.websiteQuality !== undefined) {
+    const quality = String(body.websiteQuality).trim();
+    const allowedQuality = ["No website", "Outdated", "Needs improvement", "Mobile-friendly", "Modern"];
+    if (quality && !allowedQuality.includes(quality)) return Response.json({ error: "Invalid website assessment." }, { status: 400 });
+    data.websiteQuality = quality || null;
+  }
+  if (body.researchNotes !== undefined) data.researchNotes = String(body.researchNotes).trim().slice(0, 5000) || null;
   if (Object.keys(data).length === 0) return Response.json({ error: "No changes supplied." }, { status: 400 });
 
   const prospect = await prisma.prospect.update({ where: { id: String(body.id) }, data });
