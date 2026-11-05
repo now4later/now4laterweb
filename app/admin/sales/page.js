@@ -8,6 +8,7 @@ import ProspectForm from "./ProspectForm";
 import ProspectStatus from "./ProspectStatus";
 import OutreachDraftForm from "./OutreachDraftForm";
 import ProspectResearchForm from "./ProspectResearchForm";
+import NationwideDiscovery from "./NationwideDiscovery";
 
 const labels = {
   NEW: "New", RESEARCHING: "Researching", DRAFT_READY: "Draft ready",
@@ -58,6 +59,8 @@ export default async function SalesDashboardPage() {
           </div>
         ))}
       </section>
+
+      <NationwideDiscovery />
 
       <section style={{ border: "1px solid var(--border, #e1e4e8)", borderRadius: "14px", padding: "22px", marginBottom: "28px" }}>
         <h2 style={{ marginBottom: "8px" }}>Add a prospect</h2>
