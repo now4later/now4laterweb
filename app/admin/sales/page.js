@@ -80,7 +80,7 @@ export default async function SalesDashboardPage() {
                     </td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{p.contactName || "—"}</td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{p.location || "—"}</td>
-                    <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}><ProspectStatus id={p.id} initialStatus={p.status} />{p.optedOut && <div style={{ color: "#b42318", fontSize: "12px" }}>Opted out</div>}</td>
+                    <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}><ProspectStatus id={p.id} initialStatus={p.status} initialFollowUpAt={p.followUpAt?.toISOString() || ""} />{p.optedOut && <div style={{ color: "#b42318", fontSize: "12px" }}>Opted out</div>}</td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}><OutreachDraftForm prospectId={p.id} businessName={p.businessName} disabled={p.optedOut || p.status === "DO_NOT_CONTACT"} />{p.messages.length > 0 && <div style={{ fontSize: "12px", opacity: .7, marginTop: "5px" }}>{p.messages.length} draft(s)</div>}</td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{new Date(p.updatedAt).toLocaleDateString("en-US")}</td>
                   </tr>
