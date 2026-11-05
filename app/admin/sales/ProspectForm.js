@@ -17,8 +17,9 @@ export default function ProspectForm() {
 
   async function submit(event) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setBusy(true); setError(""); setSaved(false);
-    const data = Object.fromEntries(new FormData(event.currentTarget).entries());
+    const data = Object.fromEntries(new FormData(formElement).entries());
     try {
       const response = await fetch("/api/admin/sales/prospects", {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -26,7 +27,7 @@ export default function ProspectForm() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Unable to save prospect.");
-      event.currentTarget.reset();
+      formElement.reset();
       setSaved(true);
       router.refresh();
     } catch (err) {
