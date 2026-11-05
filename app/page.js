@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CONTACT_EMAIL, SOCIAL_LINKS } from "../lib/site-config";
+import VoiceAssistant from "./components/VoiceAssistant";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -412,6 +413,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      <VoiceAssistant />
     </>
   );
 }
