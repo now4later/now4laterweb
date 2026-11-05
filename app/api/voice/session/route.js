@@ -53,6 +53,7 @@ export async function POST(request) {
       audio: {
         input: {
           noise_reduction: { type: "near_field" },
+          transcription: { model: "gpt-4o-mini-transcribe" },
           turn_detection: { type: "server_vad" }
         },
         output: { voice: "cedar" }
