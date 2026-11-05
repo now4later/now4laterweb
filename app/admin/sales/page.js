@@ -5,6 +5,7 @@ import { authOptions } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
 import SignOutButton from "../../components/SignOutButton";
 import ProspectForm from "./ProspectForm";
+import ProspectStatus from "./ProspectStatus";
 
 const labels = {
   NEW: "New", RESEARCHING: "Researching", DRAFT_READY: "Draft ready",
@@ -77,7 +78,7 @@ export default async function SalesDashboardPage() {
                     </td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{p.contactName || "—"}</td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{p.location || "—"}</td>
-                    <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}><span style={statusStyle}>{labels[p.status] || p.status}</span>{p.optedOut && <div style={{ color: "#b42318", fontSize: "12px" }}>Opted out</div>}</td>
+                    <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}><ProspectStatus id={p.id} initialStatus={p.status} />{p.optedOut && <div style={{ color: "#b42318", fontSize: "12px" }}>Opted out</div>}</td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{new Date(p.updatedAt).toLocaleDateString("en-US")}</td>
                   </tr>
                 ))}
