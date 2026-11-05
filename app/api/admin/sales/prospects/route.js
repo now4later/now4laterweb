@@ -64,16 +64,25 @@ export async function PATCH(request) {
   }
 
   const allowed = ["NEW", "RESEARCHING", "DRAFT_READY", "CONTACTED", "REPLIED", "QUALIFIED", "APPOINTMENT", "WON", "LOST", "DO_NOT_CONTACT"];
-  if (!body.id || !allowed.includes(body.status)) {
-    return Response.json({ error: "A valid prospect and status are required." }, { status: 400 });
-  }
+  if (!body.id) return Response.json({ error: "A prospect ID is required." }, { status: 400 });
 
-  const prospect = await prisma.prospect.update({
-    where: { id: String(body.id) },
-    data: {
-      status: body.status,
-      optedOut: body.status === "DO_NOT_CONTACT" ? true : undefined,
-    },
-  });
+  const data = {};
+  if (body.status !== undefined) {
+    if (!allowed.includes(body.status)) return Response.json({ error: "Invalid prospect status." }, { status: 400 });
+    data.status = body.status;
+    if (body.status === "DO_NOT_CONTACT") data.optedOut = true;
+  }
+  if (body.followUpAt !== undefined) {
+    if (body.followUpAt === null || body.followUpAt === "") {
+      data.followUpAt = null;
+    } else {
+      const date = new Date(body.followUpAt);
+      if (Number.isNaN(date.getTime())) return Response.json({ error: "Invalid follow-up date." }, { status: 400 });
+      data.followUpAt = date;
+    }
+  }
+  if (Object.keys(data).length === 0) return Response.json({ error: "No changes supplied." }, { status: 400 });
+
+  const prospect = await prisma.prospect.update({ where: { id: String(body.id) }, data });
   return Response.json({ prospect });
 }
