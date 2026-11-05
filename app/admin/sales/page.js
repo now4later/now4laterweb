@@ -7,6 +7,7 @@ import SignOutButton from "../../components/SignOutButton";
 import ProspectForm from "./ProspectForm";
 import ProspectStatus from "./ProspectStatus";
 import OutreachDraftForm from "./OutreachDraftForm";
+import ProspectResearchForm from "./ProspectResearchForm";
 
 const labels = {
   NEW: "New", RESEARCHING: "Researching", DRAFT_READY: "Draft ready",
@@ -77,6 +78,7 @@ export default async function SalesDashboardPage() {
                       <strong>{p.businessName}</strong>
                       {p.website && <div><a href={p.website.startsWith("http") ? p.website : "https://" + p.website} target="_blank" rel="noreferrer">{p.website}</a></div>}
                       {p.email && <div style={{ fontSize: "13px", opacity: .7 }}>{p.email}</div>}
+                      <ProspectResearchForm prospect={p} />
                     </td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{p.contactName || "—"}</td>
                     <td style={{ padding: "12px 10px", borderBottom: "1px solid var(--border, #eee)" }}>{p.location || "—"}</td>
