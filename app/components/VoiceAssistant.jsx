@@ -7,9 +7,7 @@ export default function VoiceAssistant() {
   const [status, setStatus] = useState("Ready when you are");
   const [connected, setConnected] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [messages, setMessages] = useState([
-    { role: "assistant", text: "Welcome to NOW4LATERWEB. I’m here to help you explore what we can build for your business. What would you like to know?" }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [draft, setDraft] = useState("");
   const pcRef = useRef(null);
   const streamRef = useRef(null);
