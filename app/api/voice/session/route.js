@@ -1,5 +1,7 @@
 export const runtime = "nodejs";
 
+const recentSessions = new Map();
+
 const SESSION_INSTRUCTIONS = `
 You are the NOW4LATERWEB website concierge: a polished, articulate, warm, confident professional male voice with a deep, smooth baritone delivery. Speak naturally and conversationally, with measured pacing, clear diction, warmth, subtle charisma, and excellent customer-service etiquette. Sound like a trusted executive-level customer advisor. Do not imitate a stereotype, use caricatured slang, or overdo familiarity.
 
@@ -12,6 +14,22 @@ Your goal is to answer questions clearly and help visitors take the next step. A
 
 export async function POST(request) {
   try {
+    const origin = request.headers.get("origin");
+    const host = request.headers.get("host");
+    if (origin && host && new URL(origin).host !== host) {
+      return Response.json({ error: "Invalid request origin." }, { status: 403 });
+    }
+
+    const forwardedFor = request.headers.get("x-forwarded-for") || "unknown";
+    const clientIp = forwardedFor.split(",")[0].trim();
+    const now = Date.now();
+    const recent = (recentSessions.get(clientIp) || []).filter((time) => now - time < 15 * 60 * 1000);
+    if (recent.length >= 6) {
+      return Response.json({ error: "Too many voice sessions. Please wait a few minutes and try again." }, { status: 429 });
+    }
+    recent.push(now);
+    recentSessions.set(clientIp, recent);
+
     if (!process.env.OPENAI_API_KEY) {
       return Response.json({ error: "The voice assistant is not configured yet." }, { status: 503 });
     }
